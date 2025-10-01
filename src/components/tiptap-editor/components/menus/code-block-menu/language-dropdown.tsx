@@ -34,7 +34,15 @@ export const LanguageDropdown = ({
 
   const filteredOptions = useMemo(() => {
     if (!search) return options;
-    return options.filter((item) => item.label.includes(search.toLowerCase()));
+
+    const q = search.trim().toLowerCase();
+
+    return options.filter((item) => {
+      const label = item.label.toLowerCase();
+      const value = item.value.toLowerCase();
+
+      return label.includes(q) || value.includes(q);
+    });
   }, [options, search]);
 
   const currentLanguage = useMemo(

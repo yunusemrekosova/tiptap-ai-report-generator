@@ -1,49 +1,47 @@
-// HTML String Format (Compact - no line breaks)
+// HTML String Format
 export const htmlMock = {
-  title:
-    "Building Modern Rich Text Editors with Tiptap: A Complete Developer Guide",
-  content: `<h2>Why Choose Tiptap for Your Next Project?</h2><p>In the rapidly evolving landscape of web development, creating engaging content editing experiences has become crucial for modern applications. Tiptap stands out as a headless rich text editor built on top of ProseMirror, offering developers unparalleled flexibility and control over their editing interfaces while maintaining powerful functionality under the hood.</p><h3>The Headless Advantage</h3><p>Unlike traditional WYSIWYG editors that come with predefined UI components, Tiptap gives you complete control over the user interface. This headless approach means you can design editors that perfectly match your application's design system and user experience requirements.</p><pre><code class="language-javascript">import { useEditor, EditorContent } from '@tiptap/react'\nimport StarterKit from '@tiptap/starter-kit'\n\nconst TiptapEditor = () => {\n  const editor = useEditor({\n    extensions: [StarterKit],\n    content: '&lt;p&gt;Start typing your content here...&lt;/p&gt;',\n    editorProps: {\n      attributes: {\n        class: 'prose prose-sm sm:prose lg:prose-lg xl:prose-2xl mx-auto focus:outline-none',\n      },\n    },\n  })\n\n  return &lt;EditorContent editor={editor} /&gt;\n}</code></pre><figure><img src="https://res.cloudinary.com/dmhzdv5kf/image/upload/v1735024108/tiptap-editor-interface.jpg" alt="Tiptap Editor Interface Example" style="width:85%" data-width="1200" data-height="700" /><figcaption>A modern Tiptap editor interface with custom toolbar and styling</figcaption></figure><h2>Essential Extensions and Customization</h2><p>Tiptap's modular architecture shines through its extension system. Each piece of functionality is provided by an extension, allowing you to build exactly the editor you need without unnecessary bloat.</p><h3>Popular Extensions You Should Know</h3><ul><li><strong>StarterKit:</strong> Includes basic formatting like bold, italic, headings, and lists</li><li><strong>Image:</strong> Drag-and-drop image support with resizing capabilities</li><li><strong>Link:</strong> URL linking with customizable validation and styling</li><li><strong>Table:</strong> Full-featured table editing with row/column manipulation</li><li><strong>CodeBlock:</strong> Syntax-highlighted code blocks with language selection</li></ul><pre><code class="language-javascript">import { Editor } from '@tiptap/core'\nimport StarterKit from '@tiptap/starter-kit'\nimport Image from '@tiptap/extension-image'\nimport Link from '@tiptap/extension-link'\nimport CodeBlockLowlight from '@tiptap/extension-code-block-lowlight'\nimport { lowlight } from 'lowlight'\n\nconst editor = new Editor({\n  element: document.querySelector('.element'),\n  extensions: [\n    StarterKit,\n    Image.configure({\n      HTMLAttributes: {\n        class: 'rounded-lg shadow-md',\n      },\n    }),\n    Link.configure({\n      openOnClick: false,\n      HTMLAttributes: {\n        class: 'text-blue-600 underline cursor-pointer',\n      },\n    }),\n    CodeBlockLowlight.configure({\n      lowlight,\n    }),\n  ],\n  content: '&lt;p&gt;Hello World! 🌎️&lt;/p&gt;',\n})</code></pre><blockquote><p>"The beauty of Tiptap lies in its flexibility. You're not constrained by predetermined UI decisions – you have the freedom to create exactly the editing experience your users need." - Philipp Kühn, Creator of Tiptap</p></blockquote><h3>Building Custom Extensions</h3><p>Creating custom extensions allows you to add specialized functionality tailored to your application's needs. Here's how you can build a simple custom node:</p><pre><code class="language-javascript">import { Node, mergeAttributes } from '@tiptap/core'\n\nconst CustomCallout = Node.create({\n  name: 'callout',\n  \n  addOptions() {\n    return {\n      types: ['info', 'warning', 'error', 'success'],\n      HTMLAttributes: {},\n    }\n  },\n\n  addAttributes() {\n    return {\n      type: {\n        default: 'info',\n        parseHTML: element => element.getAttribute('data-type'),\n        renderHTML: attributes => ({\n          'data-type': attributes.type,\n        }),\n      },\n    }\n  },\n\n  parseHTML() {\n    return [\n      {\n        tag: 'div[data-type]',\n      },\n    ]\n  },\n\n  renderHTML({ HTMLAttributes }) {\n    return [\n      'div',\n      mergeAttributes(\n        { class: 'callout' },\n        this.options.HTMLAttributes,\n        HTMLAttributes,\n      ),\n      0,\n    ]\n  },\n\n  addCommands() {\n    return {\n      setCallout: attributes => ({ commands }) => {\n        return commands.wrapIn(this.name, attributes)\n      },\n    }\n  },\n})</code></pre><h2>Advanced Features and Real-World Applications</h2><p>Modern applications demand more than basic text editing. Tiptap excels in providing advanced features that power sophisticated content management systems and collaborative platforms.</p><table><thead><tr><th>Feature</th><th>Use Case</th><th>Implementation Complexity</th><th>Performance Impact</th></tr></thead><tbody><tr><td>Collaborative Editing</td><td>Multi-user documents</td><td>High</td><td>Medium</td></tr><tr><td>Slash Commands</td><td>Quick content insertion</td><td>Medium</td><td>Low</td></tr><tr><td>Drag & Drop</td><td>Media and block reordering</td><td>Medium</td><td>Low</td></tr><tr><td>Real-time Preview</td><td>Live markdown rendering</td><td>Low</td><td>Low</td></tr><tr><td>Custom Nodes</td><td>Specialized content types</td><td>High</td><td>Variable</td></tr></tbody></table><h3>Implementing Slash Commands</h3><p>Slash commands provide users with a quick way to insert content and format text, similar to modern editors like Notion:</p><pre><code class="language-javascript">import { Extension } from '@tiptap/core'\nimport Suggestion from '@tiptap/suggestion'\n\nconst SlashCommand = Extension.create({\n  name: 'slashCommand',\n\n  addOptions() {\n    return {\n      suggestion: {\n        char: '/',\n        command: ({ editor, range, props }) => {\n          props.command({ editor, range })\n        },\n      },\n    }\n  },\n\n  addProseMirrorPlugins() {\n    return [\n      Suggestion({\n        editor: this.editor,\n        ...this.options.suggestion,\n      }),\n    ]\n  },\n})\n\n// Usage with command items\nconst commandItems = [\n  {\n    title: 'Heading 1',\n    command: ({ editor, range }) => {\n      editor.chain().focus().deleteRange(range).setHeading({ level: 1 }).run()\n    },\n  },\n  {\n    title: 'Bold Text',\n    command: ({ editor, range }) => {\n      editor.chain().focus().deleteRange(range).toggleBold().run()\n    },\n  },\n]</code></pre><iframe width="560" height="315" src="https://www.youtube.com/embed/tiptap-slash-commands-demo" title="Tiptap Slash Commands Demo"></iframe><h2>Performance Optimization and Best Practices</h2><p>Building performant editors requires attention to several key areas, from initial setup to ongoing maintenance and optimization strategies.</p><h3>Memory Management and Editor Lifecycle</h3><p>Proper editor lifecycle management is crucial for preventing memory leaks in single-page applications:</p><pre><code class="language-javascript">import { useEffect, useRef } from 'react'\nimport { useEditor } from '@tiptap/react'\n\nconst MyEditor = () => {\n  const editor = useEditor({\n    extensions: [StarterKit],\n    content: '&lt;p&gt;Hello World!&lt;/p&gt;',\n  })\n\n  // Cleanup on unmount\n  useEffect(() => {\n    return () => {\n      if (editor) {\n        editor.destroy()\n      }\n    }\n  }, [editor])\n\n  return &lt;EditorContent editor={editor} /&gt;\n}</code></pre><h3>Optimizing Large Documents</h3><p>For applications dealing with large documents or complex content structures, consider these optimization strategies:</p><ol><li><strong>Lazy Loading Extensions:</strong> Load extensions dynamically based on content requirements</li><li><strong>Virtual Scrolling:</strong> Implement virtual scrolling for very long documents</li><li><strong>Content Chunking:</strong> Break large documents into manageable sections</li><li><strong>Debounced Updates:</strong> Use debouncing for auto-save and live preview features</li></ol><h2>Integration with Modern Frameworks</h2><p>Tiptap seamlessly integrates with popular frameworks, making it a versatile choice for various technology stacks and development environments.</p><h3>Next.js Integration Best Practices</h3><p>When using Tiptap with Next.js, consider server-side rendering implications and dynamic imports:</p><pre><code class="language-javascript">import dynamic from 'next/dynamic'\n\n// Dynamically import to avoid SSR issues\nconst TiptapEditor = dynamic(() => import('../components/TiptapEditor'), {\n  ssr: false,\n  loading: () => &lt;div className="animate-pulse h-96 bg-gray-200 rounded"&gt;&lt;/div&gt;,\n})\n\nexport default function EditorPage() {\n  return (\n    &lt;div className="container mx-auto py-8"&gt;\n      &lt;h1 className="text-3xl font-bold mb-6"&gt;Document Editor&lt;/h1&gt;\n      &lt;TiptapEditor /&gt;\n    &lt;/div&gt;\n  )\n}</code></pre><h2>Security Considerations and Content Sanitization</h2><p>When dealing with user-generated content, security should always be a top priority. Tiptap provides built-in sanitization, but additional measures may be necessary depending on your use case.</p><ul><li>HTML sanitization to prevent XSS attacks</li><li>Content validation and schema enforcement</li><li>File upload restrictions and scanning</li><li>Rate limiting for collaborative features</li></ul><h2>Future-Proofing Your Editor Implementation</h2><p>As content editing requirements continue to evolve, building with extensibility and maintainability in mind ensures your editor can grow with your application's needs. Tiptap's architecture supports this evolution through its modular design and active ecosystem.</p><p>The combination of flexibility, performance, and developer experience makes Tiptap an excellent choice for applications ranging from simple blog editors to complex collaborative platforms. By understanding its core concepts and leveraging its powerful extension system, you can create editing experiences that truly serve your users' needs.</p>`,
-  wordCount: 672,
+  title: "Tiptap: The Headless Rich Text Editor for Modern Web Applications",
+  content:
+    '<h2>What is Tiptap?</h2><p>Tiptap is a headless, framework-agnostic rich text editor built on top of ProseMirror. Unlike traditional WYSIWYG editors, Tiptap gives you complete control over the user interface while providing a powerful and extensible editing experience. It\'s the perfect choice for developers who want to build custom editing experiences without sacrificing functionality.</p><h3>Why Choose Tiptap?</h3><p>Tiptap stands out from other rich text editors by offering unparalleled flexibility and developer experience. It\'s designed to be extended, customized, and integrated seamlessly into any modern web application.</p><ul><li><p><strong>Headless Architecture:</strong> Build your own UI with complete design freedom</p></li><li><p><strong>Framework Agnostic:</strong> Works with React, Vue, Svelte, and vanilla JavaScript</p></li><li><p><strong>Extensible:</strong> Create custom extensions or use community-built ones</p></li><li><p><strong>TypeScript First:</strong> Full type safety and excellent IDE support</p></li><li><p><strong>Collaborative Editing:</strong> Built-in support for real-time collaboration</p></li></ul><figure><img src="https://images.unsplash.com/photo-1499951360447-b19be8fe80f5?w=1200&amp;h=700&amp;fit=crop" alt="Developer working with Tiptap" caption="Building custom rich text experiences with Tiptap\'s flexible architecture" data-width="1200" data-height="700" style="width: 85%;"><figcaption>Building custom rich text experiences with Tiptap\'s flexible architecture</figcaption></figure><h2>Core Features</h2><p>Tiptap comes packed with features that make it the go-to choice for modern web applications requiring rich text editing capabilities.</p><h3>Rich Text Formatting</h3><p>Tiptap supports all standard text formatting options you\'d expect from a modern editor, with the ability to customize and extend each one.</p><pre><code class="language-typescript">import { useEditor, EditorContent } from \'@tiptap/react\'\nimport StarterKit from \'@tiptap/starter-kit\'\n\nfunction MyEditor() {\n  const editor = useEditor({\n    extensions: [StarterKit],\n    content: \'&lt;p&gt;Hello Tiptap!&lt;/p&gt;\',\n  })\n\n  return &lt;EditorContent editor={editor} /&gt;\n}</code></pre><h3>Built-in Extensions</h3><p>Tiptap provides a comprehensive set of extensions out of the box, covering everything from basic text formatting to advanced features like tables and code blocks.</p><table style="min-width: 105px;"><colgroup><col style="min-width: 35px;"><col style="min-width: 35px;"><col style="min-width: 35px;"></colgroup><tbody><tr><th colspan="1" rowspan="1" style="vertical-align: top; text-align: center;"><p>Extension</p></th><th colspan="1" rowspan="1" style="vertical-align: top; text-align: center;"><p>Description</p></th><th colspan="1" rowspan="1" style="vertical-align: top; text-align: center;"><p>Use Case</p></th></tr><tr><td colspan="1" rowspan="1" style="vertical-align: top; text-align: center;"><p>StarterKit</p></td><td colspan="1" rowspan="1" style="vertical-align: top; text-align: center;"><p>Bundle of essential extensions</p></td><td colspan="1" rowspan="1" style="vertical-align: top; text-align: center;"><p>Quick setup for most projects</p></td></tr><tr><td colspan="1" rowspan="1" style="vertical-align: top; text-align: center;"><p>Table</p></td><td colspan="1" rowspan="1" style="vertical-align: top; text-align: center;"><p>Full-featured table support</p></td><td colspan="1" rowspan="1" style="vertical-align: top; text-align: center;"><p>Data presentation, layouts</p></td></tr><tr><td colspan="1" rowspan="1" style="vertical-align: top; text-align: center;"><p>CodeBlock</p></td><td colspan="1" rowspan="1" style="vertical-align: top; text-align: center;"><p>Syntax-highlighted code blocks</p></td><td colspan="1" rowspan="1" style="vertical-align: top; text-align: center;"><p>Technical documentation</p></td></tr><tr><td colspan="1" rowspan="1" style="vertical-align: top; text-align: center;"><p>Image</p></td><td colspan="1" rowspan="1" style="vertical-align: top; text-align: center;"><p>Image insertion and manipulation</p></td><td colspan="1" rowspan="1" style="vertical-align: top; text-align: center;"><p>Visual content</p></td></tr><tr><td colspan="1" rowspan="1" style="vertical-align: top; text-align: center;"><p>Link</p></td><td colspan="1" rowspan="1" style="vertical-align: top; text-align: center;"><p>Hyperlink management</p></td><td colspan="1" rowspan="1" style="vertical-align: top; text-align: center;"><p>Navigation, references</p></td></tr><tr><td colspan="1" rowspan="1" style="vertical-align: top; text-align: center;"><p>Collaboration</p></td><td colspan="1" rowspan="1" style="vertical-align: top; text-align: center;"><p>Real-time collaborative editing</p></td><td colspan="1" rowspan="1" style="vertical-align: top; text-align: center;"><p>Team workflows</p></td></tr></tbody></table><blockquote><p>"Tiptap\'s extensibility is unmatched. We were able to build a custom editor for our documentation platform in days, not weeks." - Engineering Team at Vercel</p></blockquote><h2>Creating Custom Extensions</h2><p>One of Tiptap\'s most powerful features is the ability to create custom extensions tailored to your specific needs. Extensions can add new nodes, marks, or even completely new functionality.</p><h3>Example: Custom Mention Extension</h3><pre><code class="language-typescript">import { Node, mergeAttributes } from \'@tiptap/core\'\nimport { ReactNodeViewRenderer } from \'@tiptap/react\'\nimport MentionComponent from \'./MentionComponent\'\n\nexport const Mention = Node.create({\n  name: \'mention\',\n  \n  group: \'inline\',\n  inline: true,\n  selectable: false,\n  atom: true,\n\n  addAttributes() {\n    return {\n      id: {\n        default: null,\n        parseHTML: element =&gt; element.getAttribute(\'data-id\'),\n        renderHTML: attributes =&gt; ({\n          \'data-id\': attributes.id,\n        }),\n      },\n      label: {\n        default: null,\n        parseHTML: element =&gt; element.getAttribute(\'data-label\'),\n        renderHTML: attributes =&gt; ({\n          \'data-label\': attributes.label,\n        }),\n      },\n    }\n  },\n\n  parseHTML() {\n    return [{ tag: \'span[data-mention]\' }]\n  },\n\n  renderHTML({ HTMLAttributes }) {\n    return [\'span\', mergeAttributes({ \'data-mention\': \'\' }, HTMLAttributes)]\n  },\n\n  addNodeView() {\n    return ReactNodeViewRenderer(MentionComponent)\n  },\n})</code></pre><figure><img src="https://images.unsplash.com/photo-1551650975-87deedd944c3?w=1200&amp;h=700&amp;fit=crop" alt="Custom Tiptap extensions" caption="Custom extensions enable unique editing experiences tailored to your application" data-width="1200" data-height="700" style="width: 75%;"><figcaption>Custom extensions enable unique editing experiences tailored to your application</figcaption></figure><h2>Collaborative Editing</h2><p>Tiptap includes first-class support for collaborative editing through its Collaboration extension, powered by Yjs. Multiple users can edit the same document simultaneously with automatic conflict resolution.</p><h3>Setting Up Collaboration</h3><pre><code class="language-typescript">import { useEditor } from \'@tiptap/react\'\nimport StarterKit from \'@tiptap/starter-kit\'\nimport Collaboration from \'@tiptap/extension-collaboration\'\nimport CollaborationCursor from \'@tiptap/extension-collaboration-cursor\'\nimport * as Y from \'yjs\'\nimport { WebrtcProvider } from \'y-webrtc\'\n\nconst ydoc = new Y.Doc()\nconst provider = new WebrtcProvider(\'document-name\', ydoc)\n\nfunction CollaborativeEditor() {\n  const editor = useEditor({\n    extensions: [\n      StarterKit.configure({\n        history: false, // Disable history for collaboration\n      }),\n      Collaboration.configure({\n        document: ydoc,\n      }),\n      CollaborationCursor.configure({\n        provider: provider,\n        user: {\n          name: \'John Doe\',\n          color: \'#f783ac\',\n        },\n      }),\n    ],\n  })\n\n  return &lt;EditorContent editor={editor} /&gt;  \n}</code></pre><h2>Styling and Customization</h2><p>Since Tiptap is headless, you have complete control over the styling. You can use any CSS framework or custom styles to create the perfect look for your application.</p><h3>Popular Styling Approaches</h3><ol><li><p><strong>Tailwind CSS:</strong> Utility-first approach for rapid development</p></li><li><p><strong>CSS Modules:</strong> Scoped styles for component isolation</p></li><li><p><strong>Styled Components:</strong> CSS-in-JS for dynamic styling</p></li><li><p><strong>shadcn/ui:</strong> Pre-built components with Tiptap integration</p></li></ol><h2>Performance Optimization</h2><p>Tiptap is built with performance in mind, but there are several strategies you can employ to ensure optimal performance even with large documents.</p><ul><li><p><strong>Lazy Loading:</strong> Load extensions only when needed</p></li><li><p><strong>Debouncing:</strong> Reduce update frequency for auto-save features</p></li><li><p><strong>Virtual Scrolling:</strong> Handle extremely long documents efficiently</p></li><li><p><strong>Code Splitting:</strong> Separate editor code from main bundle</p></li></ul><h2>Integration Examples</h2><p>Tiptap integrates seamlessly with popular frameworks and tools. Here are some common integration patterns.</p><h3>Next.js Integration</h3><pre><code class="language-typescript">\'use client\'\n\nimport { useEditor, EditorContent } from \'@tiptap/react\'\nimport StarterKit from \'@tiptap/starter-kit\'\nimport { useEffect } from \'react\'\n\nexport default function TiptapEditor({ \n  initialContent, \n  onChange \n}: { \n  initialContent: string\n  onChange: (html: string) =&gt; void \n}) {\n  const editor = useEditor({\n    extensions: [StarterKit],\n    content: initialContent,\n    onUpdate: ({ editor }) =&gt; {\n      onChange(editor.getHTML())\n    },\n  })\n\n  useEffect(() =&gt; {\n    return () =&gt; {\n      editor?.destroy()\n    }\n  }, [editor])\n\n  return (\n    &lt;div className="prose max-w-none"&gt;\n      &lt;EditorContent editor={editor} /&gt;\n    &lt;/div&gt;\n  )\n}</code></pre><h2>Use Cases</h2><p>Tiptap is versatile enough to power a wide range of applications, from simple note-taking apps to complex content management systems.</p><h3>Common Applications</h3><ul><li><p><strong>Content Management Systems:</strong> Blog platforms, documentation sites</p></li><li><p><strong>Note-Taking Apps:</strong> Personal wikis, knowledge bases</p></li><li><p><strong>Collaborative Tools:</strong> Team workspaces, project management</p></li><li><p><strong>Email Clients:</strong> Rich email composition</p></li><li><p><strong>Social Platforms:</strong> Post creation, comments</p></li><li><p><strong>Educational Platforms:</strong> Course content, assignments</p></li></ul><h2>Community and Ecosystem</h2><p>Tiptap has a thriving community that contributes extensions, templates, and integrations. The ecosystem continues to grow with new extensions and tools being released regularly.</p><h3>Popular Community Extensions</h3><ul><li><p><strong>tiptap-extension-global-drag-handle:</strong> Drag and drop blocks</p></li><li><p><strong>tiptap-markdown:</strong> Markdown input/output support</p></li><li><p><strong>tiptap-extension-emoji:</strong> Emoji picker integration</p></li><li><p><strong>tiptap-extension-slash-command:</strong> Notion-style slash commands</p></li></ul><h2>Getting Started</h2><p>Ready to start building with Tiptap? The setup process is straightforward and you can have a working editor in minutes.</p><h3>Installation</h3><pre><code class="language-bash"># Install core packages\nnpm install @tiptap/react @tiptap/pm @tiptap/starter-kit\n\n# Install additional extensions as needed\nnpm install @tiptap/extension-table @tiptap/extension-image</code></pre><h3>Basic Setup</h3><pre><code class="language-typescript">import { useEditor, EditorContent } from \'@tiptap/react\'\nimport StarterKit from \'@tiptap/starter-kit\'\nimport Table from \'@tiptap/extension-table\'\nimport TableRow from \'@tiptap/extension-table-row\'\nimport TableCell from \'@tiptap/extension-table-cell\'\nimport TableHeader from \'@tiptap/extension-table-header\'\nimport Image from \'@tiptap/extension-image\'\n\nfunction App() {\n  const editor = useEditor({\n    extensions: [\n      StarterKit,\n      Table.configure({\n        resizable: true,\n      }),\n      TableRow,\n      TableHeader,\n      TableCell,\n      Image,\n    ],\n    content: \'Start editing...\',\n  })\n\n  return (\n    &lt;div&gt;\n      &lt;EditorContent editor={editor} /&gt;\n    &lt;/div&gt;\n  )\n}</code></pre><h2>Conclusion</h2><p>Tiptap represents the future of rich text editing on the web. Its headless architecture, extensive customization options, and powerful extension system make it the ideal choice for developers who need complete control over their editing experience. Whether you\'re building a simple blog or a complex collaborative platform, Tiptap provides the foundation you need to create exceptional user experiences.</p><h3>Next Steps</h3><p>Explore the official documentation, try out the interactive examples, and join the community to see what others are building with Tiptap. The possibilities are endless!</p>',
+  wordCount: 1245,
   cover:
-    "https://res.cloudinary.com/dmhzdv5kf/image/upload/v1735024108/tiptap-developer-guide.jpg",
-  author: "Frontend Architect",
-  createdAt: "Jan, 28 2025",
-  readingTime: 4,
+    "https://images.unsplash.com/photo-1499951360447-b19be8fe80f5?w=1200&h=800&fit=crop",
+  author: "Tiptap Team",
+  createdAt: "Jan, 30 2025",
+  readingTime: 8,
 };
 
-// Tiptap JSON Format
+// Tiptap JSON Format - Same content in Tiptap's native JSON structure
 export const jsonMock = {
-  title: "Building Scalable APIs with Node.js and TypeScript",
+  title: "Tiptap: The Headless Rich Text Editor for Modern Web Applications",
   content: {
     type: "doc",
     content: [
       {
         type: "heading",
         attrs: { level: 2 },
-        content: [{ type: "text", text: "Introduction to API Architecture" }],
+        content: [{ type: "text", text: "What is Tiptap?" }],
       },
       {
         type: "paragraph",
         content: [
           {
             type: "text",
-            text: "Modern web applications rely heavily on well-designed APIs. Building scalable APIs with Node.js and TypeScript provides type safety, better developer experience, and improved maintainability.",
+            text: "Tiptap is a headless, framework-agnostic rich text editor built on top of ProseMirror. Unlike traditional WYSIWYG editors, Tiptap gives you complete control over the user interface while providing a powerful and extensible editing experience. It's the perfect choice for developers who want to build custom editing experiences without sacrificing functionality.",
           },
         ],
       },
       {
         type: "heading",
         attrs: { level: 3 },
-        content: [
-          { type: "text", text: "Why TypeScript for API Development?" },
-        ],
+        content: [{ type: "text", text: "Why Choose Tiptap?" }],
       },
       {
         type: "paragraph",
         content: [
           {
             type: "text",
-            text: "TypeScript brings several advantages to API development:",
+            text: "Tiptap stands out from other rich text editors by offering unparalleled flexibility and developer experience. It's designed to be extended, customized, and integrated seamlessly into any modern web application.",
           },
         ],
       },
@@ -56,20 +54,14 @@ export const jsonMock = {
               {
                 type: "paragraph",
                 content: [
-                  { type: "text", text: "Compile-time error detection" },
-                ],
-              },
-            ],
-          },
-          {
-            type: "listItem",
-            content: [
-              {
-                type: "paragraph",
-                content: [
                   {
                     type: "text",
-                    text: "Better IDE support and autocompletion",
+                    marks: [{ type: "bold" }],
+                    text: "Headless Architecture:",
+                  },
+                  {
+                    type: "text",
+                    text: " Build your own UI with complete design freedom",
                   },
                 ],
               },
@@ -81,7 +73,15 @@ export const jsonMock = {
               {
                 type: "paragraph",
                 content: [
-                  { type: "text", text: "Enhanced refactoring capabilities" },
+                  {
+                    type: "text",
+                    marks: [{ type: "bold" }],
+                    text: "Framework Agnostic:",
+                  },
+                  {
+                    type: "text",
+                    text: " Works with React, Vue, Svelte, and vanilla JavaScript",
+                  },
                 ],
               },
             ],
@@ -94,7 +94,50 @@ export const jsonMock = {
                 content: [
                   {
                     type: "text",
-                    text: "Improved code documentation through types",
+                    marks: [{ type: "bold" }],
+                    text: "Extensible:",
+                  },
+                  {
+                    type: "text",
+                    text: " Create custom extensions or use community-built ones",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "listItem",
+            content: [
+              {
+                type: "paragraph",
+                content: [
+                  {
+                    type: "text",
+                    marks: [{ type: "bold" }],
+                    text: "TypeScript First:",
+                  },
+                  {
+                    type: "text",
+                    text: " Full type safety and excellent IDE support",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "listItem",
+            content: [
+              {
+                type: "paragraph",
+                content: [
+                  {
+                    type: "text",
+                    marks: [{ type: "bold" }],
+                    text: "Collaborative Editing:",
+                  },
+                  {
+                    type: "text",
+                    text: " Built-in support for real-time collaboration",
                   },
                 ],
               },
@@ -108,11 +151,11 @@ export const jsonMock = {
           {
             type: "image",
             attrs: {
-              src: "https://res.cloudinary.com/dmhzdv5kf/image/upload/v1733364958/nodejs-typescript-api.jpg",
-              alt: "Node.js TypeScript API Architecture",
-              width: "75%",
-              "data-width": "900",
-              "data-height": "600",
+              src: "https://images.unsplash.com/photo-1499951360447-b19be8fe80f5?w=1200&h=700&fit=crop",
+              alt: "Developer working with Tiptap",
+              width: "85%",
+              "data-width": "1200",
+              "data-height": "700",
             },
           },
           {
@@ -120,69 +163,7 @@ export const jsonMock = {
             content: [
               {
                 type: "text",
-                text: "Modern API architecture with Node.js and TypeScript",
-              },
-            ],
-          },
-        ],
-      },
-      {
-        type: "heading",
-        attrs: { level: 3 },
-        content: [{ type: "text", text: "Setting Up the Project Structure" }],
-      },
-      {
-        type: "paragraph",
-        content: [
-          {
-            type: "text",
-            text: "A well-organized project structure is essential for maintainable APIs:",
-          },
-        ],
-      },
-      {
-        type: "codeBlock",
-        attrs: { language: "bash" },
-        content: [
-          {
-            type: "text",
-            text: "src/\n├── controllers/\n├── middleware/\n├── models/\n├── routes/\n├── services/\n├── types/\n├── utils/\n└── app.ts",
-          },
-        ],
-      },
-      {
-        type: "heading",
-        attrs: { level: 3 },
-        content: [{ type: "text", text: "Database Integration with Prisma" }],
-      },
-      {
-        type: "paragraph",
-        content: [
-          {
-            type: "text",
-            text: "Prisma provides excellent TypeScript support and type-safe database operations:",
-          },
-        ],
-      },
-      {
-        type: "codeBlock",
-        attrs: { language: "typescript" },
-        content: [
-          {
-            type: "text",
-            text: "import { PrismaClient } from '@prisma/client';\n\nconst prisma = new PrismaClient();\n\nexport class UserService {\n  async createUser(data: CreateUserDto): Promise<User> {\n    return prisma.user.create({\n      data: {\n        email: data.email,\n        name: data.name,\n        role: data.role || 'USER'\n      }\n    });\n  }\n\n  async getUserById(id: string): Promise<User | null> {\n    return prisma.user.findUnique({\n      where: { id },\n      include: { posts: true }\n    });\n  }\n}",
-          },
-        ],
-      },
-      {
-        type: "blockquote",
-        content: [
-          {
-            type: "paragraph",
-            content: [
-              {
-                type: "text",
-                text: '"Type safety at the database layer eliminates entire classes of runtime errors and provides confidence in data operations." - Prisma Team',
+                text: "Building custom rich text experiences with Tiptap's flexible architecture",
               },
             ],
           },
@@ -191,14 +172,28 @@ export const jsonMock = {
       {
         type: "heading",
         attrs: { level: 2 },
-        content: [{ type: "text", text: "Authentication and Authorization" }],
+        content: [{ type: "text", text: "Core Features" }],
       },
       {
         type: "paragraph",
         content: [
           {
             type: "text",
-            text: "Implementing secure authentication is crucial for any API. Here's a robust approach using JWT tokens:",
+            text: "Tiptap comes packed with features that make it the go-to choice for modern web applications requiring rich text editing capabilities.",
+          },
+        ],
+      },
+      {
+        type: "heading",
+        attrs: { level: 3 },
+        content: [{ type: "text", text: "Rich Text Formatting" }],
+      },
+      {
+        type: "paragraph",
+        content: [
+          {
+            type: "text",
+            text: "Tiptap supports all standard text formatting options you'd expect from a modern editor, with the ability to customize and extend each one.",
           },
         ],
       },
@@ -208,7 +203,21 @@ export const jsonMock = {
         content: [
           {
             type: "text",
-            text: "interface JWTPayload {\n  userId: string;\n  email: string;\n  role: UserRole;\n}\n\nexport class AuthService {\n  private readonly JWT_SECRET = process.env.JWT_SECRET!;\n  private readonly JWT_EXPIRES_IN = '7d';\n\n  generateToken(payload: JWTPayload): string {\n    return jwt.sign(payload, this.JWT_SECRET, {\n      expiresIn: this.JWT_EXPIRES_IN\n    });\n  }\n\n  verifyToken(token: string): JWTPayload {\n    return jwt.verify(token, this.JWT_SECRET) as JWTPayload;\n  }\n}",
+            text: "import { useEditor, EditorContent } from '@tiptap/react'\nimport StarterKit from '@tiptap/starter-kit'\n\nfunction MyEditor() {\n  const editor = useEditor({\n    extensions: [StarterKit],\n    content: '<p>Hello Tiptap!</p>',\n  })\n\n  return <EditorContent editor={editor} />\n}",
+          },
+        ],
+      },
+      {
+        type: "heading",
+        attrs: { level: 3 },
+        content: [{ type: "text", text: "Built-in Extensions" }],
+      },
+      {
+        type: "paragraph",
+        content: [
+          {
+            type: "text",
+            text: "Tiptap provides a comprehensive set of extensions out of the box, covering everything from basic text formatting to advanced features like tables and code blocks.",
           },
         ],
       },
@@ -223,7 +232,7 @@ export const jsonMock = {
                 content: [
                   {
                     type: "paragraph",
-                    content: [{ type: "text", text: "Authentication Method" }],
+                    content: [{ type: "text", text: "Extension" }],
                   },
                 ],
               },
@@ -232,7 +241,7 @@ export const jsonMock = {
                 content: [
                   {
                     type: "paragraph",
-                    content: [{ type: "text", text: "Security Level" }],
+                    content: [{ type: "text", text: "Description" }],
                   },
                 ],
               },
@@ -241,16 +250,7 @@ export const jsonMock = {
                 content: [
                   {
                     type: "paragraph",
-                    content: [{ type: "text", text: "Complexity" }],
-                  },
-                ],
-              },
-              {
-                type: "tableHeader",
-                content: [
-                  {
-                    type: "paragraph",
-                    content: [{ type: "text", text: "Scalability" }],
+                    content: [{ type: "text", text: "Use Case" }],
                   },
                 ],
               },
@@ -264,7 +264,7 @@ export const jsonMock = {
                 content: [
                   {
                     type: "paragraph",
-                    content: [{ type: "text", text: "JWT Tokens" }],
+                    content: [{ type: "text", text: "StarterKit" }],
                   },
                 ],
               },
@@ -273,7 +273,9 @@ export const jsonMock = {
                 content: [
                   {
                     type: "paragraph",
-                    content: [{ type: "text", text: "High" }],
+                    content: [
+                      { type: "text", text: "Bundle of essential extensions" },
+                    ],
                   },
                 ],
               },
@@ -282,16 +284,9 @@ export const jsonMock = {
                 content: [
                   {
                     type: "paragraph",
-                    content: [{ type: "text", text: "Medium" }],
-                  },
-                ],
-              },
-              {
-                type: "tableCell",
-                content: [
-                  {
-                    type: "paragraph",
-                    content: [{ type: "text", text: "Excellent" }],
+                    content: [
+                      { type: "text", text: "Quick setup for most projects" },
+                    ],
                   },
                 ],
               },
@@ -305,7 +300,7 @@ export const jsonMock = {
                 content: [
                   {
                     type: "paragraph",
-                    content: [{ type: "text", text: "Session-based" }],
+                    content: [{ type: "text", text: "Table" }],
                   },
                 ],
               },
@@ -314,7 +309,9 @@ export const jsonMock = {
                 content: [
                   {
                     type: "paragraph",
-                    content: [{ type: "text", text: "Medium" }],
+                    content: [
+                      { type: "text", text: "Full-featured table support" },
+                    ],
                   },
                 ],
               },
@@ -323,16 +320,9 @@ export const jsonMock = {
                 content: [
                   {
                     type: "paragraph",
-                    content: [{ type: "text", text: "Low" }],
-                  },
-                ],
-              },
-              {
-                type: "tableCell",
-                content: [
-                  {
-                    type: "paragraph",
-                    content: [{ type: "text", text: "Limited" }],
+                    content: [
+                      { type: "text", text: "Data presentation, layouts" },
+                    ],
                   },
                 ],
               },
@@ -346,7 +336,7 @@ export const jsonMock = {
                 content: [
                   {
                     type: "paragraph",
-                    content: [{ type: "text", text: "OAuth 2.0" }],
+                    content: [{ type: "text", text: "CodeBlock" }],
                   },
                 ],
               },
@@ -355,7 +345,9 @@ export const jsonMock = {
                 content: [
                   {
                     type: "paragraph",
-                    content: [{ type: "text", text: "Very High" }],
+                    content: [
+                      { type: "text", text: "Syntax-highlighted code blocks" },
+                    ],
                   },
                 ],
               },
@@ -364,7 +356,23 @@ export const jsonMock = {
                 content: [
                   {
                     type: "paragraph",
-                    content: [{ type: "text", text: "High" }],
+                    content: [
+                      { type: "text", text: "Technical documentation" },
+                    ],
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "tableRow",
+            content: [
+              {
+                type: "tableCell",
+                content: [
+                  {
+                    type: "paragraph",
+                    content: [{ type: "text", text: "Image" }],
                   },
                 ],
               },
@@ -373,9 +381,103 @@ export const jsonMock = {
                 content: [
                   {
                     type: "paragraph",
-                    content: [{ type: "text", text: "Excellent" }],
+                    content: [
+                      {
+                        type: "text",
+                        text: "Image insertion and manipulation",
+                      },
+                    ],
                   },
                 ],
+              },
+              {
+                type: "tableCell",
+                content: [
+                  {
+                    type: "paragraph",
+                    content: [{ type: "text", text: "Visual content" }],
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "tableRow",
+            content: [
+              {
+                type: "tableCell",
+                content: [
+                  {
+                    type: "paragraph",
+                    content: [{ type: "text", text: "Link" }],
+                  },
+                ],
+              },
+              {
+                type: "tableCell",
+                content: [
+                  {
+                    type: "paragraph",
+                    content: [{ type: "text", text: "Hyperlink management" }],
+                  },
+                ],
+              },
+              {
+                type: "tableCell",
+                content: [
+                  {
+                    type: "paragraph",
+                    content: [{ type: "text", text: "Navigation, references" }],
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "tableRow",
+            content: [
+              {
+                type: "tableCell",
+                content: [
+                  {
+                    type: "paragraph",
+                    content: [{ type: "text", text: "Collaboration" }],
+                  },
+                ],
+              },
+              {
+                type: "tableCell",
+                content: [
+                  {
+                    type: "paragraph",
+                    content: [
+                      { type: "text", text: "Real-time collaborative editing" },
+                    ],
+                  },
+                ],
+              },
+              {
+                type: "tableCell",
+                content: [
+                  {
+                    type: "paragraph",
+                    content: [{ type: "text", text: "Team workflows" }],
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+      {
+        type: "blockquote",
+        content: [
+          {
+            type: "paragraph",
+            content: [
+              {
+                type: "text",
+                text: '"Tiptap\'s extensibility is unmatched. We were able to build a custom editor for our documentation platform in days, not weeks." - Engineering Team at Vercel',
               },
             ],
           },
@@ -383,17 +485,104 @@ export const jsonMock = {
       },
       {
         type: "heading",
-        attrs: { level: 3 },
-        content: [{ type: "text", text: "Error Handling and Validation" }],
+        attrs: { level: 2 },
+        content: [{ type: "text", text: "Creating Custom Extensions" }],
       },
       {
         type: "paragraph",
         content: [
           {
             type: "text",
-            text: "Robust error handling and request validation are essential for production APIs:",
+            text: "One of Tiptap's most powerful features is the ability to create custom extensions tailored to your specific needs. Extensions can add new nodes, marks, or even completely new functionality.",
           },
         ],
+      },
+      {
+        type: "heading",
+        attrs: { level: 3 },
+        content: [{ type: "text", text: "Example: Custom Mention Extension" }],
+      },
+      {
+        type: "codeBlock",
+        attrs: { language: "typescript" },
+        content: [
+          {
+            type: "text",
+            text: "import { Node, mergeAttributes } from '@tiptap/core'\nimport { ReactNodeViewRenderer } from '@tiptap/react'\nimport MentionComponent from './MentionComponent'\n\nexport const Mention = Node.create({\n  name: 'mention',\n  \n  group: 'inline',\n  inline: true,\n  selectable: false,\n  atom: true,\n\n  addAttributes() {\n    return {\n      id: {\n        default: null,\n        parseHTML: element => element.getAttribute('data-id'),\n        renderHTML: attributes => ({\n          'data-id': attributes.id,\n        }),\n      },\n      label: {\n        default: null,\n        parseHTML: element => element.getAttribute('data-label'),\n        renderHTML: attributes => ({\n          'data-label': attributes.label,\n        }),\n      },\n    }\n  },\n\n  parseHTML() {\n    return [{ tag: 'span[data-mention]' }]\n  },\n\n  renderHTML({ HTMLAttributes }) {\n    return ['span', mergeAttributes({ 'data-mention': '' }, HTMLAttributes)]\n  },\n\n  addNodeView() {\n    return ReactNodeViewRenderer(MentionComponent)\n  },\n})",
+          },
+        ],
+      },
+      {
+        type: "figure",
+        content: [
+          {
+            type: "image",
+            attrs: {
+              src: "https://images.unsplash.com/photo-1551650975-87deedd944c3?w=1200&h=700&fit=crop",
+              alt: "Custom Tiptap extensions",
+              width: "75%",
+              "data-width": "1200",
+              "data-height": "700",
+            },
+          },
+          {
+            type: "figcaption",
+            content: [
+              {
+                type: "text",
+                text: "Custom extensions enable unique editing experiences tailored to your application",
+              },
+            ],
+          },
+        ],
+      },
+      {
+        type: "heading",
+        attrs: { level: 2 },
+        content: [{ type: "text", text: "Collaborative Editing" }],
+      },
+      {
+        type: "paragraph",
+        content: [
+          {
+            type: "text",
+            text: "Tiptap includes first-class support for collaborative editing through its Collaboration extension, powered by Yjs. Multiple users can edit the same document simultaneously with automatic conflict resolution.",
+          },
+        ],
+      },
+      {
+        type: "heading",
+        attrs: { level: 3 },
+        content: [{ type: "text", text: "Setting Up Collaboration" }],
+      },
+      {
+        type: "codeBlock",
+        attrs: { language: "typescript" },
+        content: [
+          {
+            type: "text",
+            text: "import { useEditor } from '@tiptap/react'\nimport StarterKit from '@tiptap/starter-kit'\nimport Collaboration from '@tiptap/extension-collaboration'\nimport CollaborationCursor from '@tiptap/extension-collaboration-cursor'\nimport * as Y from 'yjs'\nimport { WebrtcProvider } from 'y-webrtc'\n\nconst ydoc = new Y.Doc()\nconst provider = new WebrtcProvider('document-name', ydoc)\n\nfunction CollaborativeEditor() {\n  const editor = useEditor({\n    extensions: [\n      StarterKit.configure({\n        history: false, // Disable history for collaboration\n      }),\n      Collaboration.configure({\n        document: ydoc,\n      }),\n      CollaborationCursor.configure({\n        provider: provider,\n        user: {\n          name: 'John Doe',\n          color: '#f783ac',\n        },\n      }),\n    ],\n  })\n\n  return <EditorContent editor={editor} />\n}",
+          },
+        ],
+      },
+      {
+        type: "heading",
+        attrs: { level: 2 },
+        content: [{ type: "text", text: "Styling and Customization" }],
+      },
+      {
+        type: "paragraph",
+        content: [
+          {
+            type: "text",
+            text: "Since Tiptap is headless, you have complete control over the styling. You can use any CSS framework or custom styles to create the perfect look for your application.",
+          },
+        ],
+      },
+      {
+        type: "heading",
+        attrs: { level: 3 },
+        content: [{ type: "text", text: "Popular Styling Approaches" }],
       },
       {
         type: "orderedList",
@@ -404,23 +593,14 @@ export const jsonMock = {
               {
                 type: "paragraph",
                 content: [
-                  { type: "text", text: "Input validation using " },
-                  { type: "text", text: "Joi", marks: [{ type: "strong" }] },
-                  { type: "text", text: " or " },
-                  { type: "text", text: "Zod", marks: [{ type: "strong" }] },
-                ],
-              },
-            ],
-          },
-          {
-            type: "listItem",
-            content: [
-              {
-                type: "paragraph",
-                content: [
                   {
                     type: "text",
-                    text: "Centralized error handling middleware",
+                    marks: [{ type: "bold" }],
+                    text: "Tailwind CSS:",
+                  },
+                  {
+                    type: "text",
+                    text: " Utility-first approach for rapid development",
                   },
                 ],
               },
@@ -434,7 +614,12 @@ export const jsonMock = {
                 content: [
                   {
                     type: "text",
-                    text: "Structured error responses with consistent format",
+                    marks: [{ type: "bold" }],
+                    text: "CSS Modules:",
+                  },
+                  {
+                    type: "text",
+                    text: " Scoped styles for component isolation",
                   },
                 ],
               },
@@ -446,7 +631,31 @@ export const jsonMock = {
               {
                 type: "paragraph",
                 content: [
-                  { type: "text", text: "Logging and monitoring integration" },
+                  {
+                    type: "text",
+                    marks: [{ type: "bold" }],
+                    text: "Styled Components:",
+                  },
+                  { type: "text", text: " CSS-in-JS for dynamic styling" },
+                ],
+              },
+            ],
+          },
+          {
+            type: "listItem",
+            content: [
+              {
+                type: "paragraph",
+                content: [
+                  {
+                    type: "text",
+                    marks: [{ type: "bold" }],
+                    text: "shadcn/ui:",
+                  },
+                  {
+                    type: "text",
+                    text: " Pre-built components with Tiptap integration",
+                  },
                 ],
               },
             ],
@@ -454,24 +663,16 @@ export const jsonMock = {
         ],
       },
       {
-        type: "iframe",
-        attrs: {
-          width: 560,
-          height: 315,
-          src: "https://www.youtube.com/embed/api-best-practices",
-        },
-      },
-      {
         type: "heading",
         attrs: { level: 2 },
-        content: [{ type: "text", text: "Performance and Caching Strategies" }],
+        content: [{ type: "text", text: "Performance Optimization" }],
       },
       {
         type: "paragraph",
         content: [
           {
             type: "text",
-            text: "Optimizing API performance involves several key strategies:",
+            text: "Tiptap is built with performance in mind, but there are several strategies you can employ to ensure optimal performance even with large documents.",
           },
         ],
       },
@@ -486,7 +687,28 @@ export const jsonMock = {
                 content: [
                   {
                     type: "text",
-                    text: "Database query optimization and indexing",
+                    marks: [{ type: "bold" }],
+                    text: "Lazy Loading:",
+                  },
+                  { type: "text", text: " Load extensions only when needed" },
+                ],
+              },
+            ],
+          },
+          {
+            type: "listItem",
+            content: [
+              {
+                type: "paragraph",
+                content: [
+                  {
+                    type: "text",
+                    marks: [{ type: "bold" }],
+                    text: "Debouncing:",
+                  },
+                  {
+                    type: "text",
+                    text: " Reduce update frequency for auto-save features",
                   },
                 ],
               },
@@ -500,7 +722,12 @@ export const jsonMock = {
                 content: [
                   {
                     type: "text",
-                    text: "Redis caching for frequently accessed data",
+                    marks: [{ type: "bold" }],
+                    text: "Virtual Scrolling:",
+                  },
+                  {
+                    type: "text",
+                    text: " Handle extremely long documents efficiently",
                   },
                 ],
               },
@@ -514,21 +741,12 @@ export const jsonMock = {
                 content: [
                   {
                     type: "text",
-                    text: "Response compression and minification",
+                    marks: [{ type: "bold" }],
+                    text: "Code Splitting:",
                   },
-                ],
-              },
-            ],
-          },
-          {
-            type: "listItem",
-            content: [
-              {
-                type: "paragraph",
-                content: [
                   {
                     type: "text",
-                    text: "Connection pooling and database optimization",
+                    text: " Separate editor code from main bundle",
                   },
                 ],
               },
@@ -539,16 +757,21 @@ export const jsonMock = {
       {
         type: "heading",
         attrs: { level: 2 },
-        content: [{ type: "text", text: "Testing and Documentation" }],
+        content: [{ type: "text", text: "Integration Examples" }],
       },
       {
         type: "paragraph",
         content: [
           {
             type: "text",
-            text: "Comprehensive testing and documentation ensure API reliability and developer experience.",
+            text: "Tiptap integrates seamlessly with popular frameworks and tools. Here are some common integration patterns.",
           },
         ],
+      },
+      {
+        type: "heading",
+        attrs: { level: 3 },
+        content: [{ type: "text", text: "Next.js Integration" }],
       },
       {
         type: "codeBlock",
@@ -556,29 +779,28 @@ export const jsonMock = {
         content: [
           {
             type: "text",
-            text: "describe('UserController', () => {\n  let app: Express;\n  let prisma: PrismaClient;\n\n  beforeEach(async () => {\n    prisma = new PrismaClient();\n    app = createTestApp();\n  });\n\n  describe('POST /users', () => {\n    it('should create a new user', async () => {\n      const userData = {\n        email: 'test@example.com',\n        name: 'Test User'\n      };\n\n      const response = await request(app)\n        .post('/users')\n        .send(userData)\n        .expect(201);\n\n      expect(response.body).toMatchObject({\n        id: expect.any(String),\n        email: userData.email,\n        name: userData.name\n      });\n    });\n  });\n});",
+            text: "'use client'\n\nimport { useEditor, EditorContent } from '@tiptap/react'\nimport StarterKit from '@tiptap/starter-kit'\nimport { useEffect } from 'react'\n\nexport default function TiptapEditor({ \n  initialContent, \n  onChange \n}: { \n  initialContent: string\n  onChange: (html: string) => void \n}) {\n  const editor = useEditor({\n    extensions: [StarterKit],\n    content: initialContent,\n    onUpdate: ({ editor }) => {\n      onChange(editor.getHTML())\n    },\n  })\n\n  useEffect(() => {\n    return () => {\n      editor?.destroy()\n    }\n  }, [editor])\n\n  return (\n    <div className=\"prose max-w-none\">\n      <EditorContent editor={editor} />\n    </div>\n  )\n}",
           },
         ],
       },
       {
         type: "heading",
         attrs: { level: 2 },
-        content: [{ type: "text", text: "Deployment and DevOps" }],
+        content: [{ type: "text", text: "Use Cases" }],
       },
       {
         type: "paragraph",
         content: [
           {
             type: "text",
-            text: "Modern deployment strategies ensure your API scales effectively. Consider containerization with Docker, orchestration with Kubernetes, and CI/CD pipelines for automated deployments.",
+            text: "Tiptap is versatile enough to power a wide range of applications, from simple note-taking apps to complex content management systems.",
           },
         ],
       },
       {
-        type: "paragraph",
-        content: [
-          { type: "text", text: "Key deployment considerations include:" },
-        ],
+        type: "heading",
+        attrs: { level: 3 },
+        content: [{ type: "text", text: "Common Applications" }],
       },
       {
         type: "bulletList",
@@ -591,7 +813,12 @@ export const jsonMock = {
                 content: [
                   {
                     type: "text",
-                    text: "Environment-specific configuration management",
+                    marks: [{ type: "bold" }],
+                    text: "Content Management Systems:",
+                  },
+                  {
+                    type: "text",
+                    text: " Blog platforms, documentation sites",
                   },
                 ],
               },
@@ -605,18 +832,11 @@ export const jsonMock = {
                 content: [
                   {
                     type: "text",
-                    text: "Health checks and monitoring endpoints",
+                    marks: [{ type: "bold" }],
+                    text: "Note-Taking Apps:",
                   },
+                  { type: "text", text: " Personal wikis, knowledge bases" },
                 ],
-              },
-            ],
-          },
-          {
-            type: "listItem",
-            content: [
-              {
-                type: "paragraph",
-                content: [{ type: "text", text: "Graceful shutdown handling" }],
               },
             ],
           },
@@ -628,11 +848,196 @@ export const jsonMock = {
                 content: [
                   {
                     type: "text",
-                    text: "Load balancing and horizontal scaling",
+                    marks: [{ type: "bold" }],
+                    text: "Collaborative Tools:",
+                  },
+                  {
+                    type: "text",
+                    text: " Team workspaces, project management",
                   },
                 ],
               },
             ],
+          },
+          {
+            type: "listItem",
+            content: [
+              {
+                type: "paragraph",
+                content: [
+                  {
+                    type: "text",
+                    marks: [{ type: "bold" }],
+                    text: "Email Clients:",
+                  },
+                  { type: "text", text: " Rich email composition" },
+                ],
+              },
+            ],
+          },
+          {
+            type: "listItem",
+            content: [
+              {
+                type: "paragraph",
+                content: [
+                  {
+                    type: "text",
+                    marks: [{ type: "bold" }],
+                    text: "Social Platforms:",
+                  },
+                  { type: "text", text: " Post creation, comments" },
+                ],
+              },
+            ],
+          },
+          {
+            type: "listItem",
+            content: [
+              {
+                type: "paragraph",
+                content: [
+                  {
+                    type: "text",
+                    marks: [{ type: "bold" }],
+                    text: "Educational Platforms:",
+                  },
+                  { type: "text", text: " Course content, assignments" },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+      {
+        type: "heading",
+        attrs: { level: 2 },
+        content: [{ type: "text", text: "Community and Ecosystem" }],
+      },
+      {
+        type: "paragraph",
+        content: [
+          {
+            type: "text",
+            text: "Tiptap has a thriving community that contributes extensions, templates, and integrations. The ecosystem continues to grow with new extensions and tools being released regularly.",
+          },
+        ],
+      },
+      {
+        type: "heading",
+        attrs: { level: 3 },
+        content: [{ type: "text", text: "Popular Community Extensions" }],
+      },
+      {
+        type: "bulletList",
+        content: [
+          {
+            type: "listItem",
+            content: [
+              {
+                type: "paragraph",
+                content: [
+                  {
+                    type: "text",
+                    marks: [{ type: "bold" }],
+                    text: "tiptap-extension-global-drag-handle:",
+                  },
+                  { type: "text", text: " Drag and drop blocks" },
+                ],
+              },
+            ],
+          },
+          {
+            type: "listItem",
+            content: [
+              {
+                type: "paragraph",
+                content: [
+                  {
+                    type: "text",
+                    marks: [{ type: "bold" }],
+                    text: "tiptap-markdown:",
+                  },
+                  { type: "text", text: " Markdown input/output support" },
+                ],
+              },
+            ],
+          },
+          {
+            type: "listItem",
+            content: [
+              {
+                type: "paragraph",
+                content: [
+                  {
+                    type: "text",
+                    marks: [{ type: "bold" }],
+                    text: "tiptap-extension-emoji:",
+                  },
+                  { type: "text", text: " Emoji picker integration" },
+                ],
+              },
+            ],
+          },
+          {
+            type: "listItem",
+            content: [
+              {
+                type: "paragraph",
+                content: [
+                  {
+                    type: "text",
+                    marks: [{ type: "bold" }],
+                    text: "tiptap-extension-slash-command:",
+                  },
+                  { type: "text", text: " Notion-style slash commands" },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+      {
+        type: "heading",
+        attrs: { level: 2 },
+        content: [{ type: "text", text: "Getting Started" }],
+      },
+      {
+        type: "paragraph",
+        content: [
+          {
+            type: "text",
+            text: "Ready to start building with Tiptap? The setup process is straightforward and you can have a working editor in minutes.",
+          },
+        ],
+      },
+      {
+        type: "heading",
+        attrs: { level: 3 },
+        content: [{ type: "text", text: "Installation" }],
+      },
+      {
+        type: "codeBlock",
+        attrs: { language: "bash" },
+        content: [
+          {
+            type: "text",
+            text: "# Install core packages\nnpm install @tiptap/react @tiptap/pm @tiptap/starter-kit\n\n# Install additional extensions as needed\nnpm install @tiptap/extension-table @tiptap/extension-image",
+          },
+        ],
+      },
+      {
+        type: "heading",
+        attrs: { level: 3 },
+        content: [{ type: "text", text: "Basic Setup" }],
+      },
+      {
+        type: "codeBlock",
+        attrs: { language: "typescript" },
+        content: [
+          {
+            type: "text",
+            text: "import { useEditor, EditorContent } from '@tiptap/react'\nimport StarterKit from '@tiptap/starter-kit'\nimport Table from '@tiptap/extension-table'\nimport TableRow from '@tiptap/extension-table-row'\nimport TableCell from '@tiptap/extension-table-cell'\nimport TableHeader from '@tiptap/extension-table-header'\nimport Image from '@tiptap/extension-image'\n\nfunction App() {\n  const editor = useEditor({\n    extensions: [\n      StarterKit,\n      Table.configure({\n        resizable: true,\n      }),\n      TableRow,\n      TableHeader,\n      TableCell,\n      Image,\n    ],\n    content: '<p>Start editing...</p>',\n  })\n\n  return (\n    <div>\n      <EditorContent editor={editor} />\n    </div>\n  )\n}",
           },
         ],
       },
@@ -646,18 +1051,32 @@ export const jsonMock = {
         content: [
           {
             type: "text",
-            text: "Building scalable APIs with Node.js and TypeScript requires careful consideration of architecture, security, performance, and maintainability. By following these patterns and best practices, you can create robust APIs that serve as reliable foundations for modern applications.",
+            text: "Tiptap represents the future of rich text editing on the web. Its headless architecture, extensive customization options, and powerful extension system make it the ideal choice for developers who need complete control over their editing experience. Whether you're building a simple blog or a complex collaborative platform, Tiptap provides the foundation you need to create exceptional user experiences.",
+          },
+        ],
+      },
+      {
+        type: "heading",
+        attrs: { level: 3 },
+        content: [{ type: "text", text: "Next Steps" }],
+      },
+      {
+        type: "paragraph",
+        content: [
+          {
+            type: "text",
+            text: "Explore the official documentation, try out the interactive examples, and join the community to see what others are building with Tiptap. The possibilities are endless!",
           },
         ],
       },
     ],
   },
-  wordCount: 720,
+  wordCount: 1245,
   cover:
-    "https://res.cloudinary.com/dmhzdv5kf/image/upload/v1733364957/nodejs-api-cover.jpg",
-  author: "Backend Developer",
-  createdAt: "Jan, 20 2025",
-  readingTime: 5,
+    "https://images.unsplash.com/photo-1499951360447-b19be8fe80f5?w=1200&h=800&fit=crop",
+  author: "Tiptap Team",
+  createdAt: "Jan, 30 2025",
+  readingTime: 8,
 };
 
 // Export both formats for easy use

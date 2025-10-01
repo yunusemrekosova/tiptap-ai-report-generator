@@ -1,4 +1,6 @@
-import { mock } from "@/sample";
+import { mockData } from "@/mock";
+
+const mock = mockData.html;
 
 export type Post = {
   title: string;
