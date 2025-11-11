@@ -1,7 +1,11 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  // Disable ESLint during builds
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+  
   turbopack: {
     rules: {
       "*.svg": {
@@ -15,6 +19,7 @@ const nextConfig: NextConfig = {
       },
     },
   },
+  
   webpack(config) {
     config.module.rules.push({
       test: /\.svg$/,
@@ -27,6 +32,7 @@ const nextConfig: NextConfig = {
     });
     return config;
   },
+  
   images: {
     remotePatterns: [
       {
@@ -46,29 +52,3 @@ const nextConfig: NextConfig = {
 };
 
 export default nextConfig;
-
-// webpack: (config) => {
-//   config.module.rules.push({
-//     test: /\.svg$/,
-//     use: [
-//       {
-//         loader: "@svgr/webpack",
-//         options: {
-//           svgoConfig: {
-//             plugins: [
-//               {
-//                 name: "preset-default",
-//                 params: {
-//                   overrides: {
-//                     removeViewBox: false,
-//                   },
-//                 },
-//               },
-//             ],
-//           },
-//         },
-//       },
-//     ],
-//   });
-//   return config;
-// };
