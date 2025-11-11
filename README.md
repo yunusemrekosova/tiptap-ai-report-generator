@@ -1,182 +1,160 @@
-# Next Tiptap Editor
+# AI-Powered Strategy Report Generator
 
-A modern, feature-rich WYSIWYG rich text editor built with [Tiptap](https://tiptap.dev/) and [Radix UI](https://www.radix-ui.com/) for React and Next.js applications.
+An intelligent document generation system built with Tiptap AI Agent, enabling conversational AI-driven creation of professional market analysis reports with web search integration and PDF enrichment capabilities.
 
-![Next Tiptap Editor](https://i.imgur.com/WW1QbSW.png)
+![Next.js](https://img.shields.io/badge/Next.js_15-black?style=for-the-badge&logo=next.js)
+![Tiptap](https://img.shields.io/badge/Tiptap_AI-blue?style=for-the-badge)
+![GPT-4o](https://img.shields.io/badge/GPT--4o-green?style=for-the-badge&logo=openai)
 
-## Demo
+## 🎯 Overview
 
-Try it yourself in this [live demo!](https://next-tiptap.vercel.app/)
+A technical demonstration of AI-powered document generation showcasing:
 
-## ✨ Features
+- **Sequential AI Orchestration** - Master prompt coordinating multiple sub-prompts
+- **Live Web Data** - Real-time research via GPT-4o web search
+- **PDF Enrichment** - Integrating annual report insights
+- **Interactive Q&A** - Conversational queries about generated content
+- **Multi-Format Export** - Markdown, HTML, and PDF output
 
-### 📝 Rich Text Editing
+## ✨ Key Features
 
-- **Text Formatting**: Bold, italic, underline, strikethrough, code, subscript, superscript
-- **Headings**: Multiple heading levels (H1-H6)
-- **Lists**: Ordered and unordered lists with nested support
-- **Text Alignment**: Left, center, right, and justify alignment
-- **Text Styling**: Custom text color and background highlighting
-- **Links**: Insert and edit hyperlinks with custom text
+### 1. Report Generation Agent
+- 7 sequential prompts building comprehensive analysis
+- Each step appends to existing content (non-destructive workflow)
+- Real-time streaming responses
+- Automatic source citation
 
-### 📦 Advanced Content
+### 2. Web Search Integration
+- GPT-4o built-in web browsing
+- Fetches current market data and competitive intelligence
+- Proper URL attribution
 
-- **Images**: Upload, resize, and add captions to images
-- **Tables**: Create and edit tables with cell alignment and formatting
-- **Code Blocks**: Syntax-highlighted code blocks with language selection
-- **YouTube Embeds**: Embed YouTube videos directly in your content
-- **Drag & Drop**: Reorder content blocks with intuitive drag handles
+### 3. PDF-Based Refinement
+- Upload company documents
+- AI extracts financial data and strategic insights
+- Integrates with citations including page numbers
 
----
+### 4. Interactive Chat Interface
+- Context-aware Q&A about generated reports
+- Cite-specific report sections in responses
+
+### 5. Professional Export
+- Download as Markdown, HTML, or PDF
+- View mode renders markdown as formatted HTML
+
+## 🏗️ Tech Stack
+
+- **Framework**: Next.js 15 with App Router
+- **Editor**: Tiptap AI Agent Extension
+- **AI**: OpenAI GPT-4o
+- **Styling**: Tailwind CSS + Typography
+- **Export**: jsPDF, html2canvas, marked
 
 ## 🚀 Quick Start
 
 ### Installation
-
 ```bash
-# Clone the repository
-git clone https://github.com/ndtrung341/next-tiptap.git
-
-# Navigate to project directory
-cd next-tiptap
+# Clone repository
+git clone https://github.com/yunusemrekosova/tiptap-ai-report-generator.git
+cd tiptap-ai-report-generator
 
 # Install dependencies
-pnpm install
-# or
 npm install
-# or
-yarn install
-```
 
-### Development
+# Configure environment variables
+# Create .env.local with:
+# OPENAI_API_KEY=your_key
+# NEXT_PUBLIC_TIPTAP_APP_ID=your_app_id
+# NEXT_PUBLIC_TIPTAP_TOKEN=your_jwt_token
 
-```bash
-# Start development server
-pnpm dev
-# or
+# Configure .npmrc for Tiptap Pro packages
+# Add your Tiptap registry token
+
+# Run development server
 npm run dev
-# or
-yarn dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) to see the editor in action.
-
----
+Open [http://localhost:3000](http://localhost:3000)
 
 ## 📖 Usage
 
-### Basic Implementation
+1. **(Optional) Upload PDF** - Add company annual report for enriched analysis
+2. **Execute Prompts** - Click buttons sequentially (1→7)
+3. **Refine with PDF** - Enrich report with document insights
+4. **Ask Questions** - Use chat interface for Q&A
+5. **Export** - Download as Markdown/HTML/PDF
+6. **View Report** - See formatted professional output
 
-```tsx
-import TiptapEditor, { type TiptapEditorRef } from "@/components/tiptap-editor";
-import { useRef } from "react";
+## 🎨 Prompt Engineering
 
-export default function MyEditor() {
-  const editorRef = useRef<TiptapEditorRef>(null);
+### Orchestration Pattern
+Sequential prompts that build upon previous outputs:
+- Step 1: Foundation (web search)
+- Steps 2-7: Append new sections
+- Step 8: PDF-based enrichment
 
-  const handleChange = (content: string) => {
-    console.log("Content updated:", content);
-  };
+### Design Principles
+- **PERSONA → TASK → FORMAT → OUTPUT** structure
+- Explicit web search instructions
+- Markdown table specifications
+- Source citation requirements
+- Append-only for sequential building
 
-  return (
-    <TiptapEditor
-      ref={editorRef}
-      output="html"
-      minHeight={320}
-      maxHeight={640}
-      onChange={handleChange}
-      placeholder={{
-        paragraph: "Start typing...",
-        imageCaption: "Add a caption (optional)",
-      }}
-    />
-  );
-}
+## 🔧 Implementation Highlights
+
+### Tiptap Features Used
+- `@tiptap-pro/extension-ai-agent` - AI document editing
+- `@tiptap-pro/extension-export` - Multi-format export
+- StarterKit, Table, CharacterCount extensions
+
+### Key Challenges Solved
+1. ✅ Enterprise AI Toolkit limitation → Custom backend integration
+2. ✅ Sequential content building → Append logic with context passing
+3. ✅ Model access issues → Switched to GPT-4o
+4. ✅ Markdown rendering → Dual-mode editor/view with marked library
+5. ✅ PDF processing in Edge → Node.js runtime for pdf-parse
+
+## 📊 Project Structure
+
+**Three-Panel Interface:**
+- **Left**: Prompt execution + PDF upload + Export
+- **Center**: Tiptap editor with streaming AI
+- **Right**: Interactive Q&A chat
+
+**Data Flow:**
+```
+Prompt → GPT-4o (+ Web Search) → Stream Response → 
+Append to Editor → Markdown ↔ HTML → Export
 ```
 
-### Editor Props
+## 🌐 Deployment
 
-| Prop            | Type                               | Default     | Description                           |
-| --------------- | ---------------------------------- | ----------- | ------------------------------------- |
-| `content`       | `Content`                          | `undefined` | Initial editor content (HTML or JSON) |
-| `output`        | `"html" \| "json"`                 | `"html"`    | Output format for content             |
-| `readonly`      | `boolean`                          | `false`     | Make editor read-only                 |
-| `disabled`      | `boolean`                          | `false`     | Disable editor interactions           |
-| `minHeight`     | `string \| number`                 | `320`       | Minimum editor height (px)            |
-| `maxHeight`     | `string \| number`                 | `undefined` | Maximum editor height (px)            |
-| `maxWidth`      | `string \| number`                 | `undefined` | Maximum editor width (px)             |
-| `placeholder`   | `string \| Record<string, string>` | `undefined` | Placeholder text                      |
-| `ssr`           | `boolean`                          | `false`     | Enable server-side rendering          |
-| `throttleDelay` | `number`                           | `1500`      | Throttle delay for `onChange` (ms)    |
-| `onChange`      | `(content: Content) => void`       | `undefined` | Callback when content changes         |
+Deploy to Vercel:
+```bash
+# Install Vercel CLI
+npm i -g vercel
+
+# Deploy
+vercel
+```
+
+Add environment variables in Vercel dashboard.
+
+## 📝 Environment Variables
+```env
+OPENAI_API_KEY=sk-...                    # OpenAI API key
+NEXT_PUBLIC_TIPTAP_APP_ID=...           # Tiptap Cloud App ID
+NEXT_PUBLIC_TIPTAP_TOKEN=...            # Tiptap JWT token
+```
+
+## 👨‍💻 Author
+
+**Yunus Emre Kosova**
+
+## 📄 License
+
+Educational and demonstration purposes.
 
 ---
 
-### Accessing Editor Instance
-
-```tsx
-const editorRef = useRef<TiptapEditorRef>(null);
-
-// Get editor instance
-const editor = editorRef.current;
-
-// Get content
-const htmlContent = editor?.getHTML();
-const jsonContent = editor?.getJSON();
-
-// Get statistics
-const wordCount = editor?.storage.characterCount.words();
-const charCount = editor?.storage.characterCount.characters();
-
-// Programmatic control
-editor?.commands.setContent("<p>New content</p>");
-editor?.commands.focus();
-```
-
----
-
-## 🎨 Customization
-
-### Styling
-
-The editor uses CSS variables for theming. Customize colors in your `globals.css`:
-
-```css
-:root {
-  --rte-editor-min-height: 320px;
-  --rte-editor-max-height: 640px;
-  --rte-editor-max-width: 700px;
-}
-```
-
-### Extensions
-
-Add or remove Tiptap extensions in `src/components/tiptap-editor/extensions/index.ts`:
-
-```ts
-import { Extension } from "@tiptap/core";
-
-export const createExtensions = ({ placeholder }) => [
-  // Add your custom extensions here
-  StarterKit,
-  Image,
-  Link,
-  Table,
-  // ... more extensions
-];
-```
-
----
-
-## 🛠️ Tech Stack
-
-- **Framework**: [Next.js 15](https://nextjs.org/) - App Router
-- **Editor**: [Tiptap](https://tiptap.dev/) - Headless editor framework
-- **UI Components**: [Radix UI](https://www.radix-ui.com/)
-- **Styling**: [SCSS](https://sass-lang.com/) + [Tailwind CSS](https://tailwindcss.com/)
-- **Language**: [TypeScript](https://www.typescriptlang.org/)
-- **Form Handling**: [React Hook Form](https://react-hook-form.com/)
-- **Icons**: [React Icons](https://react-icons.github.io/react-icons/)
-
-<br />
-<p align="center"><strong>Built with ❤️ using Next.js and Tiptap</strong></p>
+**Powered by Tiptap AI Agent & GPT-4o**
