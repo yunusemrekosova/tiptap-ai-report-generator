@@ -1,35 +1,39 @@
 "use client";
-
 import React from "react";
-
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-
 import ThemeSwitcher from "./theme-switcher";
-import GithubIcon from "../../assets/github.svg";
-import Logo from "../../assets/logo.svg";
+import Image from "next/image";
 
 const Header = () => {
   const pathname = usePathname();
   const isEditPage = pathname === "/";
-
+  
   return (
     <header className="sticky z-50 top-0 px-6 border-b border-neutral-300 dark:border-neutral-700 bg-white/20 dark:bg-[#0d101820] backdrop-blur-lg">
       <div className="h-16 max-w-screen-xl w-full mx-auto flex items-center justify-between gap-6">
-        <Link href="/">
-          <Logo width={120} />
+        {/* 3Horizons Logo */}
+        <Link href="/" className="flex items-center gap-2">
+          <Image 
+            src="/3horizons-logo.png" 
+            alt="3Horizons" 
+            width={180} 
+            height={40}
+            className="object-contain"
+          />
         </Link>
+        
+        {/* View/Edit Toggle - Changed text */}
         <Link
           href={isEditPage ? "/post-csr" : "/"}
           className="px-4 py-2 text-sm font-medium rounded-lg border border-neutral-300 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
         >
-          {isEditPage ? "View Post" : "Edit Post"}
+          {isEditPage ? "View Report" : "Edit Report"}
         </Link>
+        
+        {/* Theme Switcher Only */}
         <div className="flex gap-5">
           <ThemeSwitcher />
-          <Link href="https://github.com/ndtrung341/next-tiptap">
-            <GithubIcon className="size-5" />
-          </Link>
         </div>
       </div>
     </header>

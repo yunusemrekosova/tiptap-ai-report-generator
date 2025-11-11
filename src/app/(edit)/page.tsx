@@ -1,11 +1,6 @@
-import EditForm from "./_components/edit-form";
-
+import EditFormWithAI from "@/app/(edit)/_components/edit-form-with-ai";
 import "./style.scss";
 
 export default function EditPage() {
-  return (
-    <div className="w-full max-w-[56rem] mx-auto py-10 px-6">
-      <EditForm />
-    </div>
-  );
+  return <EditFormWithAI />;
 }
