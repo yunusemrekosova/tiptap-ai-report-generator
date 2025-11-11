@@ -16,7 +16,7 @@ export default function EditFormWithAI() {
   const form = useForm<PostForm>({
     defaultValues: { title: "", content: "" },
   });
-  const { debouncedSave, post } = usePost();
+  const { debouncedSave } = usePost();
 
   const calculateReadingTime = useCallback(() => {
     const editor = editorRef.current;
@@ -24,13 +24,7 @@ export default function EditFormWithAI() {
     return Math.max(1, Math.ceil(wordCount / 150));
   }, []);
 
-  useEffect(() => {
-    const editor = editorRef.current!;
-    if (post) {
-      loadInitialContent(editor, post.content);
-      form.reset({ ...post });
-    }
-  }, [post, form]);
+  // Removed the useEffect that loads post content - start fresh every time
 
   useEffect(() => {
     const subscription = form.watch((values, { type }) => {
