@@ -2,7 +2,6 @@
 import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import ThemeSwitcher from "./theme-switcher";
 import Image from "next/image";
 
 const Header = () => {
@@ -23,7 +22,7 @@ const Header = () => {
           />
         </Link>
         
-        {/* View/Edit Toggle - Changed text */}
+        {/* View/Edit Toggle */}
         <Link
           href={isEditPage ? "/post-csr" : "/"}
           className="px-4 py-2 text-sm font-medium rounded-lg border border-neutral-300 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
@@ -31,10 +30,8 @@ const Header = () => {
           {isEditPage ? "View Report" : "Edit Report"}
         </Link>
         
-        {/* Theme Switcher Only */}
-        <div className="flex gap-5">
-          <ThemeSwitcher />
-        </div>
+        {/* Empty div for spacing (or remove this section entirely) */}
+        <div className="w-5"></div>
       </div>
     </header>
   );

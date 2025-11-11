@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef } from "react";
 import { useForm, Controller } from "react-hook-form";
+
 import TiptapEditor, { type TiptapEditorRef } from "@/components/tiptap-editor";
 import { loadInitialContent } from "@/components/tiptap-editor/helpers/tiptap";
 import { usePost } from "@/hooks/use-post";
@@ -15,7 +16,7 @@ export default function EditFormWithAI() {
   const form = useForm<PostForm>({
     defaultValues: { title: "", content: "" },
   });
-  const { debouncedSave, isLoading, post } = usePost();
+  const { debouncedSave, post } = usePost();
 
   const calculateReadingTime = useCallback(() => {
     const editor = editorRef.current;
@@ -29,7 +30,7 @@ export default function EditFormWithAI() {
       loadInitialContent(editor, post.content);
       form.reset({ ...post });
     }
-  }, [post]);
+  }, [post, form]);
 
   useEffect(() => {
     const subscription = form.watch((values, { type }) => {
@@ -58,7 +59,7 @@ export default function EditFormWithAI() {
                   {...field}
                   type="text"
                   className="w-full px-4 py-2.5 shadow border border-[#d1d9e0] rounded-md bg-white dark:bg-[#0d1017] dark:text-white dark:border-[#3d444d] outline-none"
-                  placeholder="Team Wendy Market Report"
+                  placeholder=""
                 />
               )}
             />
@@ -76,14 +77,14 @@ export default function EditFormWithAI() {
                 <TiptapEditor
                   ref={editorRef}
                   output="html"
-                  content={post?.content}
+                  content=""
                   minHeight={300}
                   maxHeight={650}
                   maxWidth={700}
                   onChange={field.onChange}
                   placeholder={{
-                    paragraph: "AI-generated market report will appear here...",
-                    imageCaption: "Type caption for image (optional)",
+                    paragraph: "Click a prompt button to generate your report...",
+                    imageCaption: "",
                   }}
                 />
               )}
