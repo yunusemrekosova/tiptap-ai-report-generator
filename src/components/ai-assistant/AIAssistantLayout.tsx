@@ -1,9 +1,10 @@
 'use client';
 
 import React from 'react';
+import { Editor } from '@tiptap/react';
+
 import { PromptSidebar } from './PromptSidebar';
 import { ChatInterface } from './ChatInterface';
-import { Editor } from '@tiptap/react';
 
 type AIAssistantLayoutProps = {
   editor: Editor | null;
@@ -21,8 +22,8 @@ export function AIAssistantLayout({ editor, children }: AIAssistantLayoutProps) 
         {children}
       </div>
       
-      {/* Right Sidebar */}
-      <ChatInterface />
+      {/* Right Sidebar - PASS editor prop */}
+      <ChatInterface editor={editor} />
     </div>
   );
 }
