@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 
 import TiptapEditor, { type TiptapEditorRef } from "@/components/tiptap-editor";
@@ -13,10 +13,12 @@ type PostForm = Pick<Post, "title" | "content" | "readingTime">;
 
 export default function EditFormWithAI() {
   const editorRef = useRef<TiptapEditorRef>(null);
+  const [hasLoaded, setHasLoaded] = useState(false);
+  
   const form = useForm<PostForm>({
     defaultValues: { title: "", content: "" },
   });
-  const { debouncedSave } = usePost();
+  const { debouncedSave, post } = usePost();
 
   const calculateReadingTime = useCallback(() => {
     const editor = editorRef.current;
@@ -24,8 +26,17 @@ export default function EditFormWithAI() {
     return Math.max(1, Math.ceil(wordCount / 150));
   }, []);
 
-  // Removed the useEffect that loads post content - start fresh every time
+  // Load saved content only once when component mounts
+  useEffect(() => {
+    const editor = editorRef.current!;
+    if (post && !hasLoaded && editor) {
+      loadInitialContent(editor, post.content);
+      form.reset({ ...post });
+      setHasLoaded(true);
+    }
+  }, [post, hasLoaded, form]);
 
+  // Auto-save on changes
   useEffect(() => {
     const subscription = form.watch((values, { type }) => {
       if (type === "change") {
@@ -71,7 +82,7 @@ export default function EditFormWithAI() {
                 <TiptapEditor
                   ref={editorRef}
                   output="html"
-                  content=""
+                  content={post?.content || ""}
                   minHeight={300}
                   maxHeight={650}
                   maxWidth={700}
