@@ -30,8 +30,15 @@ export default function EditFormWithAI() {
   useEffect(() => {
     const editor = editorRef.current!;
     if (post && !hasLoaded && editor) {
-      loadInitialContent(editor, post.content);
-      form.reset({ ...post });
+      // Only load if there's actual content (not just the default Tiptap text)
+      const hasRealContent = post.content && 
+        !post.content.includes("What is Tiptap") && 
+        post.content.trim().length > 50;
+      
+      if (hasRealContent) {
+        loadInitialContent(editor, post.content);
+        form.reset({ ...post });
+      }
       setHasLoaded(true);
     }
   }, [post, hasLoaded, form]);
@@ -41,7 +48,14 @@ export default function EditFormWithAI() {
     const subscription = form.watch((values, { type }) => {
       if (type === "change") {
         const readingTime = calculateReadingTime();
-        debouncedSave({ ...values, readingTime });
+        
+        // Only save if there's actual content
+        const editor = editorRef.current;
+        const wordCount = editor?.storage.characterCount.words() ?? 0;
+        
+        if (wordCount > 0) {
+          debouncedSave({ ...values, readingTime });
+        }
       }
     });
     return () => subscription.unsubscribe();
@@ -82,7 +96,7 @@ export default function EditFormWithAI() {
                 <TiptapEditor
                   ref={editorRef}
                   output="html"
-                  content={post?.content || ""}
+                  content=""
                   minHeight={300}
                   maxHeight={650}
                   maxWidth={700}
